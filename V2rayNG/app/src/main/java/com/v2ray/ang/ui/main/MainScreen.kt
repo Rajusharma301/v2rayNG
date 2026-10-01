@@ -214,37 +214,13 @@ fun MainScreen(
                 )
                 },
             ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(180.dp)
-                        .clip(CircleShape)
-                        .background(if (isRunning) colorFabActive else Color(0xFFB8C9C0))
-                        .clickable { onAction(MainAction.ToggleService) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            if (isRunning) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp
-                        ),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(72.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = displayText,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            HomeContent(
+                modifier = Modifier.padding(innerPadding),
+                isRunning = isRunning,
+                displayText = displayText,
+                onToggle = { onAction(MainAction.ToggleService) },
+                onSelectServer = { showServerSheet = true }
+            )
 
             if (showServerSheet && groups.isNotEmpty()) {
                 ModalBottomSheet(onDismissRequest = { showServerSheet = false }) {
