@@ -141,7 +141,8 @@ fun HomeContent(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            AuraLogo(Modifier.size(56.dp))
+        Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = if (isRunning) "VPN Connected" else "VPN Disconnected",
                 fontSize = 16.sp,
@@ -149,7 +150,7 @@ fun HomeContent(
             )
             Text(
                 text = timeText,
-                fontSize = 40.sp,
+                fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -158,7 +159,7 @@ fun HomeContent(
 
             Box(
                 modifier = Modifier
-                    .size(230.dp)
+                    .size(200.dp)
                     .shadow(if (isRunning) 30.dp else 12.dp, CircleShape, ambientColor = green, spotColor = green)
                     .clip(CircleShape)
                     .background(outerBrush)
@@ -179,7 +180,7 @@ fun HomeContent(
                 }
                 Box(
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(128.dp)
                         .clip(CircleShape)
                         .background(innerColor)
                         .clickable(onClick = onToggle),
@@ -191,7 +192,7 @@ fun HomeContent(
                         ),
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(56.dp)
+                        modifier = Modifier.size(46.dp)
                     )
                 }
             }
@@ -239,14 +240,14 @@ fun HomeContent(
                     .background(cardColor)
                     .border(1.dp, green.copy(alpha = 0.25f), RoundedCornerShape(24.dp))
                     .clickable(onClick = onSelectServer)
-                    .padding(20.dp),
+                    .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
                     Text(
                         text = "Select Server",
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )

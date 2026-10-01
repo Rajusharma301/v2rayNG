@@ -1,4 +1,8 @@
 package com.v2ray.ang.ui.main
+import androidx.compose.material3.Text
+import androidx.compose.ui.unit.sp
+import com.v2ray.ang.ui.compose.LocalDarkTheme
+import com.v2ray.ang.ui.compose.ThemeManager
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +41,11 @@ fun MainTopBar(
                 )
             }
         },
-        actions = {}
+        actions = {
+            val dark = LocalDarkTheme.current
+            IconButton(onClick = { ThemeManager.setThemeMode(if (dark) "1" else "2") }) {
+                Text(if (dark) "\u2600\uFE0F" else "\uD83C\uDF19", fontSize = 22.sp)
+            }
+        }
     )
 }
