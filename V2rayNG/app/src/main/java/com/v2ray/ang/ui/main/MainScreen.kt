@@ -1,5 +1,23 @@
 package com.v2ray.ang.ui.main
-
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.colorFabActive
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +51,7 @@ import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
@@ -54,6 +72,7 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showSearch by remember { mutableStateOf(false) }
+    var showServerSheet by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
@@ -150,6 +169,7 @@ fun MainScreen(
         }
     ) {
         Scaffold(
+            containerColor = Color.Black,
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 MainTopBar(
@@ -189,69 +209,100 @@ fun MainScreen(
                     displayText = displayText,
                     isRunning = isRunning,
                     isDarkTheme = isDarkTheme,
-                    onAction = onAction
+                    onAction = onAction,
+                    onSelectServer = { showServerSheet = true }
                 )
-            },
-            floatingActionButton = {},
-        ) { innerPadding ->
-            val layoutDirection = LocalLayoutDirection.current
-
-            if (groups.isNotEmpty()) {
-                Column(
+                },
+            ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                        .size(180.dp)
+                        .clip(CircleShape)
+                        .background(if (isRunning) colorFabActive else Color(0xFF2C2C2E))
+                        .clickable { onAction(MainAction.ToggleService) },
+                    contentAlignment = Alignment.Center
                 ) {
-                    if (groups.size > 1) {
-                        GroupTabBar(
-                            groups = groups,
-                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
-                            mainViewModel = mainViewModel,
-                            onTabClick = { targetIndex ->
-                                scope.launch {
-                                    pagerState.navigateToPageOptimized(
-                                        targetPage = targetIndex,
-                                        animateAdjacentPage = true
-                                    )
+                    Icon(
+                        painter = painterResource(
+                            if (isRunning) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp
+                        ),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(72.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = displayText,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            if (showServerSheet && groups.isNotEmpty()) {
+                ModalBottomSheet(onDismissRequest = { showServerSheet = false }) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (groups.size > 1) {
+                            GroupTabBar(
+                                groups = groups,
+                                selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
+                                mainViewModel = mainViewModel,
+                                onTabClick = { targetIndex ->
+                                    scope.launch {
+                                        pagerState.navigateToPageOptimized(
+                                            targetPage = targetIndex,
+                                            animateAdjacentPage = true
+                                        )
+                                    }
                                 }
-                            }
-                        )
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        userScrollEnabled = true,
-                        beyondViewportPageCount = 1,
-                        key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
-                    ) { page ->
-                        val group = groups.getOrNull(page) ?: return@HorizontalPager
-
-                        GroupPagerPage(
-                            groupId = group.id,
-                            mainViewModel = mainViewModel,
-                            selectedGuid = selectedGuid,
-                            locateTarget = uiState.locateTarget,
-                            doubleColumnDisplay = doubleColumnDisplay,
-                            searchQuery = searchQuery,
-                            lazyListStates = lazyListStates,
-                            lazyGridStates = lazyGridStates,
-                            onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
-                            onShareServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, false)
-                            },
-                            onMoreServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, true)
-                            },
-                            onRemoveServer = removeServer,
-                            contentPadding = PaddingValues(
-                                start = 0.dp,
-                                top = 0.dp,
-                                end = 0.dp,
-                                bottom = 80.dp
                             )
-                        )
+                        }
+
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize(),
+                            userScrollEnabled = true,
+                            beyondViewportPageCount = 1,
+                            key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
+                        ) { page ->
+                            val group = groups.getOrNull(page) ?: return@HorizontalPager
+
+                            GroupPagerPage(
+                                groupId = group.id,
+                                mainViewModel = mainViewModel,
+                                selectedGuid = selectedGuid,
+                                locateTarget = uiState.locateTarget,
+                                doubleColumnDisplay = doubleColumnDisplay,
+                                searchQuery = searchQuery,
+                                lazyListStates = lazyListStates,
+                                lazyGridStates = lazyGridStates,
+                                onSelectServer = { guid ->
+                                    onAction(MainAction.SelectServer(guid))
+                                    showServerSheet = false
+                                },
+                                onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                                onShareServer = { guid, profile ->
+                                    shareTarget = Triple(guid, profile, false)
+                                },
+                                onMoreServer = { guid, profile ->
+                                    shareTarget = Triple(guid, profile, true)
+                                },
+                                onRemoveServer = removeServer,
+                                contentPadding = PaddingValues(
+                                    start = 0.dp,
+                                    top = 0.dp,
+                                    end = 0.dp,
+                                    bottom = 80.dp
+                                )
+                            )
+                        }
                     }
                 }
             }
