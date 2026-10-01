@@ -1,23 +1,6 @@
 package com.v2ray.ang.ui.main
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.colorFabActive
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,9 +10,14 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,16 +30,17 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
@@ -68,11 +57,10 @@ fun MainScreen(
     val confirmRemove = uiState.confirmRemove
     val shareQRCodeBitmap = uiState.shareQRCodeBitmap
 
-    val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var tab by rememberSaveable { mutableStateOf(0) }
     var showSearch by remember { mutableStateOf(false) }
-    var showServerSheet by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
@@ -156,6 +144,13 @@ fun MainScreen(
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
 
+    val tabs = listOf(
+        "Home" to R.drawable.ic_play_24dp,
+        "Servers" to R.drawable.ic_subscriptions_24dp,
+        "Speed Test" to R.drawable.ic_routing_24dp,
+        "Settings" to R.drawable.ic_settings_24dp
+    )
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -188,99 +183,111 @@ fun MainScreen(
                     onSearchToggle = { show: Boolean -> showSearch = show },
                     onMenuClick = { scope.launch { drawerState.open() } },
                     onAction = onAction,
-                    onMoreMenuAction = { action ->
-                        when (action) {
-                            MainMoreMenuAction.RestartService -> onAction(MainAction.RestartService)
-                            MainMoreMenuAction.DeleteAll -> showDelAllConfirm = true
-                            MainMoreMenuAction.DeleteDuplicate -> showDelDuplicateConfirm = true
-                            MainMoreMenuAction.DeleteInvalid -> showDelInvalidConfirm = true
-                            MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
-                            MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
-                            MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
-                            MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
-                            MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
-                            MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
-                        }
-                    }
+                    onMoreMenuAction = {}
                 )
             },
             bottomBar = {
-                MainBottomBar(
-                    displayText = displayText,
+                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                    tabs.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = tab == index,
+                            onClick = { tab = index },
+                            icon = { Icon(painterResource(item.second), contentDescription = item.first) },
+                            label = { Text(item.first) }
+                        )
+                    }
+                }
+            },
+        ) { innerPadding ->
+            val contentModifier = Modifier.padding(innerPadding)
+
+            when (tab) {
+                0 -> HomeContent(
+                    modifier = contentModifier,
                     isRunning = isRunning,
-                    isDarkTheme = isDarkTheme,
-                    onAction = onAction,
-                    onSelectServer = { showServerSheet = true }
+                    displayText = displayText,
+                    onToggle = { onAction(MainAction.ToggleService) },
+                    onSelectServer = { tab = 1 }
                 )
-                },
-            ) { innerPadding ->
-            HomeContent(
-                modifier = Modifier.padding(innerPadding),
-                isRunning = isRunning,
-                displayText = displayText,
-                onToggle = { onAction(MainAction.ToggleService) },
-                onSelectServer = { showServerSheet = true }
-            )
 
-            if (showServerSheet && groups.isNotEmpty()) {
-                ModalBottomSheet(onDismissRequest = { showServerSheet = false }) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        if (groups.size > 1) {
-                            GroupTabBar(
-                                groups = groups,
-                                selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
-                                mainViewModel = mainViewModel,
-                                onTabClick = { targetIndex ->
-                                    scope.launch {
-                                        pagerState.navigateToPageOptimized(
-                                            targetPage = targetIndex,
-                                            animateAdjacentPage = true
-                                        )
+                1 -> {
+                    if (groups.isNotEmpty()) {
+                        Column(modifier = contentModifier.fillMaxSize()) {
+                            if (groups.size > 1) {
+                                GroupTabBar(
+                                    groups = groups,
+                                    selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
+                                    mainViewModel = mainViewModel,
+                                    onTabClick = { targetIndex ->
+                                        scope.launch {
+                                            pagerState.navigateToPageOptimized(
+                                                targetPage = targetIndex,
+                                                animateAdjacentPage = true
+                                            )
+                                        }
                                     }
-                                }
-                            )
-                        }
-
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier.fillMaxSize(),
-                            userScrollEnabled = true,
-                            beyondViewportPageCount = 1,
-                            key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
-                        ) { page ->
-                            val group = groups.getOrNull(page) ?: return@HorizontalPager
-
-                            GroupPagerPage(
-                                groupId = group.id,
-                                mainViewModel = mainViewModel,
-                                selectedGuid = selectedGuid,
-                                locateTarget = uiState.locateTarget,
-                                doubleColumnDisplay = doubleColumnDisplay,
-                                searchQuery = searchQuery,
-                                lazyListStates = lazyListStates,
-                                lazyGridStates = lazyGridStates,
-                                onSelectServer = { guid ->
-                                    onAction(MainAction.SelectServer(guid))
-                                    showServerSheet = false
-                                },
-                                onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
-                                onShareServer = { guid, profile ->
-                                    shareTarget = Triple(guid, profile, false)
-                                },
-                                onMoreServer = { guid, profile ->
-                                    shareTarget = Triple(guid, profile, true)
-                                },
-                                onRemoveServer = removeServer,
-                                contentPadding = PaddingValues(
-                                    start = 0.dp,
-                                    top = 0.dp,
-                                    end = 0.dp,
-                                    bottom = 80.dp
                                 )
-                            )
+                            }
+
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier.fillMaxSize(),
+                                userScrollEnabled = true,
+                                beyondViewportPageCount = 1,
+                                key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
+                            ) { page ->
+                                val group = groups.getOrNull(page) ?: return@HorizontalPager
+
+                                GroupPagerPage(
+                                    groupId = group.id,
+                                    mainViewModel = mainViewModel,
+                                    selectedGuid = selectedGuid,
+                                    locateTarget = uiState.locateTarget,
+                                    doubleColumnDisplay = doubleColumnDisplay,
+                                    searchQuery = searchQuery,
+                                    lazyListStates = lazyListStates,
+                                    lazyGridStates = lazyGridStates,
+                                    onSelectServer = { guid ->
+                                        onAction(MainAction.SelectServer(guid))
+                                        tab = 0
+                                    },
+                                    onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                                    onShareServer = { guid, profile ->
+                                        shareTarget = Triple(guid, profile, false)
+                                    },
+                                    onMoreServer = { guid, profile ->
+                                        shareTarget = Triple(guid, profile, true)
+                                    },
+                                    onRemoveServer = removeServer,
+                                    contentPadding = PaddingValues(
+                                        start = 0.dp,
+                                        top = 0.dp,
+                                        end = 0.dp,
+                                        bottom = 16.dp
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = contentModifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No servers yet.\nOpen the menu and choose Subscriptions to add.")
                         }
                     }
                 }
+
+                2 -> SpeedTestContent(
+                    modifier = contentModifier,
+                    statusText = displayText,
+                    onAction = onAction
+                )
+
+                else -> SettingsContent(
+                    modifier = contentModifier,
+                    onNavigate = onNavigate
+                )
             }
         }
     }
