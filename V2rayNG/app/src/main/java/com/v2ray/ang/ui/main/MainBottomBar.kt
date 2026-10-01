@@ -40,7 +40,7 @@ fun MainBottomBar(
                 .fillMaxWidth()
                 .height(56.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFF1C1C1E))
+                .background(MaterialTheme.colorScheme.surface)
                 .clickable(onClick = onSelectServer)
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -48,10 +48,10 @@ fun MainBottomBar(
         ) {
             Text(
                 text = "Select Server",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge
             )
-            Text(text = "▲", color = Color.White)
+            Text(text = "▲", color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

@@ -169,7 +169,7 @@ fun MainScreen(
         }
     ) {
         Scaffold(
-            containerColor = Color.Black,
+            containerColor = MaterialTheme.colorScheme.background,
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 MainTopBar(
@@ -225,7 +225,7 @@ fun MainScreen(
                     modifier = Modifier
                         .size(180.dp)
                         .clip(CircleShape)
-                        .background(if (isRunning) colorFabActive else Color(0xFF2C2C2E))
+                        .background(if (isRunning) colorFabActive else Color(0xFFB8C9C0))
                         .clickable { onAction(MainAction.ToggleService) },
                     contentAlignment = Alignment.Center
                 ) {
@@ -241,7 +241,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = displayText,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
