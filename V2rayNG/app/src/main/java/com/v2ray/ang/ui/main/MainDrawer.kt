@@ -94,11 +94,7 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                         painter = painterResource(R.drawable.ic_aura_fg),
                         contentDescription = null,
                         modifier = Modifier.size(120.dp),
-                        colorFilter = if (isDarkTheme) {
-                            ColorFilter.tint(Color.White, BlendMode.SrcIn)
-                        } else {
-                            null
-                        }
+                        colorFilter = null
                     )
                     Text(
                         text = stringResource(R.string.app_name),
