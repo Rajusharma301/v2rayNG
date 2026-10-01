@@ -128,7 +128,8 @@ fun HomeContent(
     val cardColor = if (isDark) MaterialTheme.colorScheme.surfaceContainerHigh
     else MaterialTheme.colorScheme.surface
 
-    Box(modifier = modifier.fillMaxSize()) {
+    val bgBrush = if (isDark) Brush.verticalGradient(listOf(Color(0xFF1C1B1F), Color(0xFF0E1311))) else Brush.verticalGradient(listOf(Color(0xFFF2FAF6), Color(0xFFE3F3EA)))
+    Box(modifier = modifier.fillMaxSize().background(bgBrush)) {
         WorldMapDots(
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp),
             color = green.copy(alpha = if (isDark) 0.20f else 0.22f)
@@ -158,7 +159,7 @@ fun HomeContent(
             Box(
                 modifier = Modifier
                     .size(230.dp)
-                    .shadow(12.dp, CircleShape)
+                    .shadow(if (isRunning) 30.dp else 12.dp, CircleShape, ambientColor = green, spotColor = green)
                     .clip(CircleShape)
                     .background(outerBrush)
                     .border(2.dp, green.copy(alpha = 0.3f), CircleShape),
@@ -236,6 +237,7 @@ fun HomeContent(
                     .shadow(6.dp, RoundedCornerShape(24.dp))
                     .clip(RoundedCornerShape(24.dp))
                     .background(cardColor)
+                    .border(1.dp, green.copy(alpha = 0.25f), RoundedCornerShape(24.dp))
                     .clickable(onClick = onSelectServer)
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,

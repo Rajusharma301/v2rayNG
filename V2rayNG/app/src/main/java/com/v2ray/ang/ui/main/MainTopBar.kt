@@ -21,7 +21,7 @@ fun MainTopBar(
     onMoreMenuAction: (MainMoreMenuAction) -> Unit
 ) {
     AppTopBar(
-        title = "VPN",
+        title = "Aura X VPN",
         onBackClick = {},
         isLoading = isLoading,
         isSearchActive = false,
