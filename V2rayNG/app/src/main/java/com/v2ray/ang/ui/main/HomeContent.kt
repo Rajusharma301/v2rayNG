@@ -141,7 +141,6 @@ fun HomeContent(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AuraLogo(Modifier.size(56.dp))
         Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = if (isRunning) "VPN Connected" else "VPN Disconnected",
