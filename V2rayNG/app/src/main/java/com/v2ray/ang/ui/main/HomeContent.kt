@@ -235,3 +235,34 @@ fun HomeContent(
         }
     }
 }
+
+@Composable
+fun AuraBanner(modifier: Modifier = Modifier) {
+    // Ads slot: replace this content with an ad view later.
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f), RoundedCornerShape(24.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AuraLogo(Modifier.size(64.dp))
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(
+                text = "Aura X",
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Fast · Private · Secure",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+    }
+}

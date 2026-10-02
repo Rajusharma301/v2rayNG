@@ -153,13 +153,12 @@ fun MainScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = false,
         drawerContent = {
-            MainDrawerContent(
+            AuraDrawer(
                 drawerState = drawerState,
-                onNavigate = { route ->
+                onSelect = { index ->
+                    tab = index
                     scope.launch { drawerState.close() }
-                    onNavigate(route)
                 }
             )
         }
@@ -182,7 +181,7 @@ fun MainScreen(
                         showSearch = false
                     },
                     onSearchToggle = { show: Boolean -> showSearch = show },
-                    onMenuClick = {},
+                    onMenuClick = { scope.launch { drawerState.open() } },
                     onAction = onAction,
                     onMoreMenuAction = {}
                 )
