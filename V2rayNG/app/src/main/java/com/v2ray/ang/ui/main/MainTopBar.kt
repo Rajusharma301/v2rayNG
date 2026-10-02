@@ -1,16 +1,16 @@
 package com.v2ray.ang.ui.main
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.ThemeManager
-
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.AppTopBar
 
 @Composable
 fun MainTopBar(
@@ -24,6 +24,7 @@ fun MainTopBar(
     onAction: (MainAction) -> Unit,
     onMoreMenuAction: (MainMoreMenuAction) -> Unit
 ) {
+    val isDark = LocalDarkTheme.current
     AppTopBar(
         title = "Aura X VPN",
         onBackClick = {},
@@ -34,17 +35,11 @@ fun MainTopBar(
         onSearchClose = onSearchClose,
         searchPlaceholder = "",
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    painterResource(R.drawable.ic_menu_24dp),
-                    contentDescription = stringResource(R.string.acc_open_menu)
-                )
-            }
+            AuraLogo(Modifier.padding(start = 12.dp).size(36.dp))
         },
         actions = {
-            val dark = LocalDarkTheme.current
-            IconButton(onClick = { ThemeManager.setThemeMode(if (dark) "1" else "2") }) {
-                Text(if (dark) "\u2600\uFE0F" else "\uD83C\uDF19", fontSize = 22.sp)
+            IconButton(onClick = { ThemeManager.setThemeMode(if (isDark) "1" else "2") }) {
+                Text(text = if (isDark) "☀️" else "🌙", fontSize = 20.sp)
             }
         }
     )

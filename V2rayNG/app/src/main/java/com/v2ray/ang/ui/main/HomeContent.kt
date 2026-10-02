@@ -231,41 +231,6 @@ fun HomeContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(6.dp, RoundedCornerShape(24.dp))
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(cardColor)
-                    .border(1.dp, green.copy(alpha = 0.25f), RoundedCornerShape(24.dp))
-                    .clickable(onClick = onSelectServer)
-                    .padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "Select Server",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "Tap to choose a location",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onSurface),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "›", color = MaterialTheme.colorScheme.surface, fontSize = 20.sp)
-                }
-            }
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
