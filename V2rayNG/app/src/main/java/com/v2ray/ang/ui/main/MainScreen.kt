@@ -153,6 +153,7 @@ fun MainScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = false,
         drawerContent = {
             MainDrawerContent(
                 drawerState = drawerState,
@@ -181,7 +182,7 @@ fun MainScreen(
                         showSearch = false
                     },
                     onSearchToggle = { show: Boolean -> showSearch = show },
-                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onMenuClick = {},
                     onAction = onAction,
                     onMoreMenuAction = {}
                 )
@@ -251,14 +252,10 @@ fun MainScreen(
                                         onAction(MainAction.SelectServer(guid))
                                         tab = 0
                                     },
-                                    onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
-                                    onShareServer = { guid, profile ->
-                                        shareTarget = Triple(guid, profile, false)
-                                    },
-                                    onMoreServer = { guid, profile ->
-                                        shareTarget = Triple(guid, profile, true)
-                                    },
-                                    onRemoveServer = removeServer,
+                                    onEditServer = { _, _ -> },
+                                    onShareServer = { _, _ -> },
+                                    onMoreServer = { _, _ -> },
+                                    onRemoveServer = { _, _ -> },
                                     contentPadding = PaddingValues(
                                         start = 0.dp,
                                         top = 0.dp,

@@ -63,21 +63,8 @@ fun SettingsContent(
             }
         }
 
-        SectionTitle("NETWORK")
-        SettingsCard {
-            SettingsRow(R.drawable.ic_routing_24dp, "Routing") { onNavigate(MainDestination.Routing) }
-            AppDivider()
-            SettingsRow(R.drawable.ic_per_apps_24dp, "Split Tunneling") { onNavigate(MainDestination.PerAppProxy) }
-            AppDivider()
-            SettingsRow(R.drawable.ic_subscriptions_24dp, "Subscriptions") { onNavigate(MainDestination.Subscriptions) }
-        }
-
         SectionTitle("APP")
         SettingsCard {
-            SettingsRow(R.drawable.ic_settings_24dp, "Advanced Settings") { onNavigate(MainDestination.Settings) }
-            AppDivider()
-            SettingsRow(R.drawable.ic_restore_24dp, "Backup & Restore") { onNavigate(MainDestination.BackupRestore) }
-            AppDivider()
             SettingsRow(R.drawable.ic_about_24dp, "About") { onNavigate(MainDestination.About) }
         }
         Spacer(modifier = Modifier.height(24.dp))
